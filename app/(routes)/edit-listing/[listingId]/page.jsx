@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -18,19 +18,86 @@ import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { supabase } from "@/utils/supabase/client";
 import { useUser } from "@clerk/nextjs";
+import FileUpload from "../_components/FileUpload";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const EditListing = () => {
   const { listingId } = useParams();
-  const { user } = useUser();
+  const { isSignedIn, user, isLoaded } = useUser();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [listing, setListing] = useState();
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     console.log(listingId);
-    console.log("Haha");
-    verifyUser();
-  }, []);
+    if (user && isLoaded) {
+      verifyUser();
+    }
+  }, [isLoaded]);
+
+  const fetchListing = async () => {
+    const { data, error } = await supabase
+      .from("listing")
+      .select("*, listingImages(listing_id, url)")
+      .eq("id", listingId);
+
+    if (error) {
+      toast.error("Error Fetching Listing");
+    }
+
+    if (data) {
+      console.log(data[0]);
+      setListing(data[0]);
+    }
+  };
+
+  const uploadImages = async () => {
+    let index = 0;
+    for (const image of images) {
+      const file = image;
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${
+        file.name.split(".")[0]
+      }-${Date.now().toString()}.${fileExt}`;
+
+      const { data, error } = await supabase.storage
+        .from("listingImages")
+        .upload(`${fileName}`, file, {
+          contentType: `image/${fileExt}`,
+          upsert: false,
+        });
+
+      if (error) {
+        toast.error("Error Uploading Images");
+        setLoading(false);
+      }
+
+      if (data) {
+        toast.success(
+          "Image Uploaded Successfully " + (index + 1 + "/" + images.length)
+        );
+        const imageUrl =
+          process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL + fileName;
+
+        const { data, error } = await supabase
+          .from("listingImages")
+          .insert([{ url: imageUrl, listing_id: listingId }])
+          .select();
+      }
+      index++;
+    }
+  };
 
   const onSubmitHandler = async (values) => {
     setLoading(true);
@@ -46,7 +113,28 @@ const EditListing = () => {
       setLoading(false);
     }
     if (data) {
-      toast.success("Listing Updated Successfully");
+      toast.success("Listing Updated Successfully and Published");
+      uploadImages();
+      setLoading(false);
+    }
+  };
+
+  const publichHandler = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("listing")
+      .update({ active: true })
+      .eq("id", listingId)
+      .select();
+
+    if (error) {
+      toast.error("Error Publishing Listing");
+      setLoading(false);
+    }
+
+    if (data) {
+      toast.success("Listing Published Successfully");
       setLoading(false);
     }
   };
@@ -58,15 +146,12 @@ const EditListing = () => {
       .eq("createdBy", user?.primaryEmailAddress.emailAddress)
       .eq("id", listingId);
 
-    if (data) {
-      setListing(data[0]);
-      console.log(data[0]);
+    if (data?.length < 0) {
+      toast.error("You are not authorized to edit this listing");
+      router.push("/");
     }
 
-    if (data.length <= 0) {
-      console.log(data[0]);
-      router.replace("/");
-    }
+    fetchListing();
   };
 
   return (
@@ -77,6 +162,12 @@ const EditListing = () => {
       <Formik
         onSubmit={(values) => {
           onSubmitHandler(values);
+        }}
+        initialValues={{
+          type: "",
+          propertyType: "",
+          profileImage: user?.imageUrl,
+          fullName: user?.fullName,
         }}
         validate={(values) => {
           const errors = {};
@@ -98,6 +189,9 @@ const EditListing = () => {
           if (!values.parking) {
             errors.parking = "Required";
           }
+          if (!values.lotSize) {
+            errors.lotSize = "Required";
+          }
           if (!values.area) {
             errors.area = "Required";
           }
@@ -113,7 +207,7 @@ const EditListing = () => {
           return errors;
         }}
       >
-        {({ values, errors, handleChange, handleSubmit, isSubmitting }) => (
+        {({ values, handleChange, handleSubmit, isSubmitting, errors }) => (
           <form onSubmit={handleSubmit}>
             <div className="p-8 rounded-lg shadow-md mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-9 mb-9">
@@ -137,9 +231,7 @@ const EditListing = () => {
                       <Label htmlFor="sell">Sell</Label>
                     </div>
                   </RadioGroup>
-                  {errors.type && (
-                    <p className="text-red-500 text-sm">{errors.type}</p>
-                  )}
+                  {errors.type && <p className="text-red-500">{errors.type}</p>}
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold text-slate-500">
@@ -165,8 +257,8 @@ const EditListing = () => {
                       <SelectItem value="condo">Condo</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.bathroom && (
-                    <p className="text-red-500 text-sm">{errors.bathroom}</p>
+                  {errors.propertyType && (
+                    <p className="text-red-500">{errors.propertyType}</p>
                   )}
                 </div>
               </div>
@@ -177,12 +269,9 @@ const EditListing = () => {
                     type="number"
                     placeholder="Ex. 2"
                     name="bedroom"
-                    defaultValue={listing?.bedroom}
                     onChange={handleChange}
+                    defaultValue={listing?.bedroom}
                   />
-                  {errors.bedroom && (
-                    <p className="text-red-500 text-sm">{errors.bedroom}</p>
-                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold text-slate-500">Bathroom</h2>
@@ -191,10 +280,8 @@ const EditListing = () => {
                     placeholder="Ex. 2"
                     name="bathroom"
                     onChange={handleChange}
+                    defaultValue={listing?.bathroom}
                   />
-                  {errors.bathroom && (
-                    <p className="text-red-500 text-sm">{errors.bathroom}</p>
-                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold text-slate-500">Built In</h2>
@@ -203,10 +290,8 @@ const EditListing = () => {
                     placeholder="Ex. 1900 Sq.ft"
                     name="builtIn"
                     onChange={handleChange}
+                    defaultValue={listing?.builtIn}
                   />
-                  {errors.builtIn && (
-                    <p className="text-red-500 text-sm">{errors.builtIn}</p>
-                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-9 mb-9">
@@ -219,9 +304,6 @@ const EditListing = () => {
                     onChange={handleChange}
                     defaultValue={listing?.parking}
                   />
-                  {errors.parking && (
-                    <p className="text-red-500 text-sm">{errors.parking}</p>
-                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold text-slate-500">
@@ -234,9 +316,6 @@ const EditListing = () => {
                     onChange={handleChange}
                     defaultValue={listing?.lotSize}
                   />
-                  {errors.lotSize && (
-                    <p className="text-red-500 text-sm">{errors.lotSize}</p>
-                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold text-slate-500">Area (Sq.Ft)</h2>
@@ -247,9 +326,6 @@ const EditListing = () => {
                     onChange={handleChange}
                     defaultValue={listing?.area}
                   />
-                  {errors.area && (
-                    <p className="text-red-500 text-sm">{errors.area}</p>
-                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-9 mb-9">
@@ -264,9 +340,6 @@ const EditListing = () => {
                     onChange={handleChange}
                     defaultValue={listing?.price}
                   />
-                  {errors.price && (
-                    <p className="text-red-500 text-sm">{errors.price}</p>
-                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold text-slate-500">
@@ -279,9 +352,6 @@ const EditListing = () => {
                     onChange={handleChange}
                     defaultValue={listing?.hoa}
                   />
-                  {errors.hoa && (
-                    <p className="text-red-500 text-sm">{errors.hoa}</p>
-                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-9 mb-9">
@@ -293,10 +363,17 @@ const EditListing = () => {
                     onChange={handleChange}
                     defaultValue={listing?.description}
                   />
-                  {errors.description && (
-                    <p className="text-red-500 text-sm">{errors.description}</p>
-                  )}
                 </div>
+              </div>
+              <div className="flex flex-col gap-2 mb-9">
+                <h2 className="font-semibold text-slate-500">
+                  Upload Property Imagess
+                </h2>
+
+                <FileUpload
+                  setImages={(images) => setImages(images)}
+                  listingImages={listing?.listingImages}
+                />
               </div>
               <div className="flex gap-5 justify-end">
                 {!loading && (
@@ -311,19 +388,49 @@ const EditListing = () => {
                     Save
                   </Button>
                 )}
-                <Button
-                  disabled={isSubmitting}
-                  type="submit"
-                  onClick={() => {
-                    console.log("Save & Publish");
-                  }}
-                >
-                  {loading ? (
-                    <Loader className="mx-auto animate-spin" />
-                  ) : (
-                    "Save & Publish"
-                  )}
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={loading}
+                      type="button"
+                      onClick={() => {
+                        console.log("Save & Publish");
+                      }}
+                    >
+                      {loading ? (
+                        <Loader className="mx-auto animate-spin" />
+                      ) : (
+                        "Publish"
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Ready to Publish your listing?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        By clicking continue, your listing will be published and
+                        visible to everyone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      {loading ? (
+                        ""
+                      ) : (
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      )}
+
+                      <AlertDialogAction onClick={publichHandler}>
+                        {loading ? (
+                          <Loader className="mx-auto animate-spin" />
+                        ) : (
+                          "Continue"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </form>
