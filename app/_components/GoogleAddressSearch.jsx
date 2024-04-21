@@ -9,12 +9,12 @@ const GoogleAddressSearch = ({ setSelectedAddress, setCoordinates }) => {
     <div className="flex items-center w-full border rounded-md">
       <MapPin
         size={10}
-        className="p-2 h-11 w-10 rounded-l-md text-primary bg-purple-200"
+        className="p-2 h-10 w-10 rounded-l-md text-primary bg-purple-200"
       />
       <GooglePlacesAutocomplete
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY}
         selectProps={{
-          placeholder: "Search Property Address",
+          placeholder: "Address...",
           label: "Search Property Address",
           isClearable: true,
           className: "w-full",
