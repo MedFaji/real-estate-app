@@ -156,9 +156,19 @@ const EditListing = () => {
 
   return (
     <div className="px-10 md:px-36 my-10">
-      <h2 className="font-bold text-2xl">
-        Enter some more details about the listing
-      </h2>
+      <div className="flex justify-between m-5">
+        <h2 className="font-bold text-2xl">
+          Enter some more details about the listing
+        </h2>
+        <div
+          className={`${
+            listing?.active ? "bg-blue-500" : "bg-yellow-500"
+          } text-white px-2 py-1 rounded-md`}
+        >
+          {listing?.active ? "Active" : "Inactive"}
+        </div>
+      </div>
+
       <Formik
         onSubmit={(values) => {
           onSubmitHandler(values);
@@ -250,11 +260,11 @@ const EditListing = () => {
                       <SelectValue placeholder="Select Property Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="single-family-house">
+                      <SelectItem value="Single-family-house">
                         Single Family House
                       </SelectItem>
-                      <SelectItem value="town-house">Town House</SelectItem>
-                      <SelectItem value="condo">Condo</SelectItem>
+                      <SelectItem value="Town-house">Town House</SelectItem>
+                      <SelectItem value="Condo">Condo</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.propertyType && (
