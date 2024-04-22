@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import GoogleAddressSearch from "./GoogleAddressSearch";
 import { Button } from "@/components/ui/button";
 import FilterSection from "./FilterSection";
+import Link from "next/link";
 
 const Listing = ({
   listing,
   handleSearchButton,
   setSearchedAddress,
+  setCoordinates,
   setBathroom,
   setBedroom,
   setParking,
@@ -21,7 +23,7 @@ const Listing = ({
       <div className="flex flex-col gap-4 mb-10">
         <div className="flex gap-2 items-center">
           <GoogleAddressSearch
-            setCoordinates={(v) => console.log(v)}
+            setCoordinates={(v) => setCoordinates(v)}
             setSelectedAddress={(v) => {
               setSearchedAddress(v);
               setAddress(v);
@@ -61,39 +63,42 @@ const Listing = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {listing.length > 0
           ? listing.map((item, index) => (
-              <div
-                key={index}
-                className="p-3 hover:border hover:border-primary rounded-md h-50 flex flex-col justify-between"
-              >
-                <Image
-                  src={item.listingImages[0]?.url}
-                  alt={item.title}
-                  width={800}
-                  height={150}
-                  className="rounded-lg object-cover h-[150px] w-[800px]"
-                />
-                <div className="flex flex-col mt-2 gap-2">
-                  <h2 className="font-bold text-xl">${item?.price}</h2>
-                  <h2 className="flex gap-1 text-sm text-gray-400">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span>{item.address}</span>
-                  </h2>
-                  <div className="flex gap-2 mt-2 justify-between">
-                    <h2 className="flex text-sm bg-slate-200 rounded-md p-2 gap-2 justify-center items-center w-full">
-                      <BedDouble className="h-4 w-4" />
-                      <span>{item?.bedroom}</span>
+              <Link href={`/view-listing/${item.id}`} key={index}>
+                <div className="p-3 hover:border hover:border-primary rounded-md h-50 flex flex-col justify-between">
+                  <Image
+                    src={
+                      item.listingImages[0]
+                        ? item.listingImages[0]?.url
+                        : "/placeholder.webp"
+                    }
+                    alt={item.title}
+                    width={800}
+                    height={150}
+                    className="rounded-lg object-cover h-[150px] w-[800px]"
+                  />
+                  <div className="flex flex-col mt-2 gap-2">
+                    <h2 className="font-bold text-xl">${item?.price}</h2>
+                    <h2 className="flex gap-1 text-sm text-gray-400">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      <span>{item.address}</span>
                     </h2>
-                    <h2 className="flex text-sm bg-slate-200 rounded-md p-2 gap-2 justify-center items-center w-full">
-                      <Bath className="h-4 w-4" />
-                      <span>{item?.bathroom}</span>
-                    </h2>
-                    <h2 className="flex text-sm bg-slate-200 rounded-md p-2 gap-2 justify-center items-center w-full">
-                      <Ruler className="h-4 w-4" />
-                      <span>{item?.area}</span>
-                    </h2>
+                    <div className="flex gap-2 mt-2 justify-between">
+                      <h2 className="flex text-sm bg-slate-200 rounded-md p-2 gap-2 justify-center items-center w-full">
+                        <BedDouble className="h-4 w-4" />
+                        <span>{item?.bedroom}</span>
+                      </h2>
+                      <h2 className="flex text-sm bg-slate-200 rounded-md p-2 gap-2 justify-center items-center w-full">
+                        <Bath className="h-4 w-4" />
+                        <span>{item?.bathroom}</span>
+                      </h2>
+                      <h2 className="flex text-sm bg-slate-200 rounded-md p-2 gap-2 justify-center items-center w-full">
+                        <Ruler className="h-4 w-4" />
+                        <span>{item?.area}</span>
+                      </h2>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           : [1, 2, 3, 4, 5].map((item, index) => (
               <div

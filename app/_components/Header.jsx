@@ -1,11 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { SignOutButton, UserButton, useUser } from "@clerk/nextjs";
 import { PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const path = usePathname();
@@ -14,7 +22,9 @@ const Header = () => {
   return (
     <div className="p-6 px-10 flex justify-between shadow-sm fixed top-0 w-full z-10 bg-white">
       <div className="flex gap-12 items-center">
-        <Image src="/logo.svg" alt="Logo" width={160} height={160} />
+        <Link href={"/"}>
+          <Image src="/logo.svg" alt="Logo" width={160} height={160} />
+        </Link>
         <ul className="hidden md:flex gap-10">
           <Link href="/">
             <li
@@ -25,10 +35,10 @@ const Header = () => {
               For Sell
             </li>
           </Link>
-          <Link href="/forrent">
+          <Link href="/rent">
             <li
               className={`hover:text-primary font-medium cursor-pointer text-sm ${
-                path === "/forrent" && "text-primary"
+                path === "/rent" && "text-primary"
               }`}
             >
               For Rent
@@ -52,7 +62,30 @@ const Header = () => {
           </Button>
         </Link>
         {isSignedIn ? (
-          <UserButton />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Image
+                src={user?.imageUrl}
+                alt="profile"
+                className="rounded-full"
+                width={35}
+                height={35}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href={"/user"}>Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href={"/user#/my-listing"}>My Listings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <SignOutButton>Logout</SignOutButton>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Link href={"/sign-in"}>
             <Button variant="outline">Sign In</Button>
