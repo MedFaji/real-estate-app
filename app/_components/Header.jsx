@@ -55,10 +55,15 @@ const Header = () => {
           </Link>
         </ul>
       </div>
-      <div className="flex gap-4 items-center">
-        <Link href={"/add-new-listing"}>
+      <div className="flex gap-4 items-center justify-center">
+        <Link href={"/add-new-listing"} className="hidden md:block">
           <Button>
             <PlusIcon className="h-4 w-4 mr-2" /> Post Your Ad
+          </Button>
+        </Link>
+        <Link href={"/add-new-listing"} className="md:hidden">
+          <Button className="h-15 w-12">
+            <PlusIcon className="h-4 w-4" />
           </Button>
         </Link>
         {isSignedIn ? (
