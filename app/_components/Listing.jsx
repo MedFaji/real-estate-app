@@ -15,7 +15,6 @@ const Listing = ({
   setBedroom,
   setParking,
   setPropertyType,
-  resetFilter,
 }) => {
   const [address, setAddress] = useState("");
   return (
@@ -48,16 +47,6 @@ const Listing = ({
           setParking={setParking}
           setPropertyType={setPropertyType}
         />
-        <div className="flex justify-end">
-          <Button
-            className="w-20  bg-transparent text-primary hover:bg-transparent hover:underline"
-            onClick={resetFilter}
-          >
-            <h2 className="flex gap-3 items-center justify-center">
-              <RotateCw className="h-4 w-4" /> Reset
-            </h2>
-          </Button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

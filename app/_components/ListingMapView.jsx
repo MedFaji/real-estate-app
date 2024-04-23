@@ -18,14 +18,6 @@ const ListingMapView = ({ type }) => {
     fetchListings();
   }, []);
 
-  const resetFilter = () => {
-    setSearchedAddress("");
-    setBedroom("");
-    setBathroom("");
-    setParking("");
-    setPropertyType("");
-  };
-
   const handleSearchButton = async () => {
     console.log(bathroom, bedroom, parking, propertyType);
     const searchTerm = searchedAddress?.value?.structured_formatting?.main_text;
@@ -95,7 +87,6 @@ const ListingMapView = ({ type }) => {
           setBedroom={setBedroom}
           setParking={setParking}
           setPropertyType={setPropertyType}
-          resetFilter={resetFilter}
           setCoordinates={setCoordinates}
         />
       </div>
