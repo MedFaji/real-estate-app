@@ -234,10 +234,10 @@ const EditListing = () => {
                       <SelectValue placeholder="Select Property Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Single-family-house">
+                      <SelectItem value="Single Family House">
                         Single Family House
                       </SelectItem>
-                      <SelectItem value="Town-house">Town House</SelectItem>
+                      <SelectItem value="Town House">Town House</SelectItem>
                       <SelectItem value="Condo">Condo</SelectItem>
                     </SelectContent>
                   </Select>

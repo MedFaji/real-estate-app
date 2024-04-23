@@ -135,17 +135,17 @@ const FilterSection = ({
                 <Home className="text-primary" /> All
               </h2>
             </SelectItem>
-            <SelectItem value="single-family-house">
+            <SelectItem value="Single Family House">
               <h2 className="flex gap-3 font-semibold items-center justify-center">
                 <Home className="text-primary" /> Single Family House
               </h2>
             </SelectItem>
-            <SelectItem value="town-house">
+            <SelectItem value="Town House">
               <h2 className="flex gap-3 font-semibold items-center justify-center">
                 <Home className="text-primary" /> Town House
               </h2>
             </SelectItem>
-            <SelectItem value="condo">
+            <SelectItem value="Condo">
               <h2 className="flex gap-3 font-semibold items-center justify-center">
                 <Home className="text-primary" /> Condo
               </h2>
