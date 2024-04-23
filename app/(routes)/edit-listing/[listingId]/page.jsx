@@ -187,33 +187,7 @@ const EditListing = () => {
           if (!values.propertyType) {
             errors.propertyType = "Required";
           }
-          if (!values.bedroom) {
-            errors.bedroom = "Required";
-          }
-          if (!values.bathroom) {
-            errors.bathroom = "Required";
-          }
-          if (!values.builtIn) {
-            errors.builtIn = "Required";
-          }
-          if (!values.parking) {
-            errors.parking = "Required";
-          }
-          if (!values.lotSize) {
-            errors.lotSize = "Required";
-          }
-          if (!values.area) {
-            errors.area = "Required";
-          }
-          if (!values.price) {
-            errors.price = "Required";
-          }
-          if (!values.hoa) {
-            errors.hoa = "Required";
-          }
-          if (!values.description) {
-            errors.description = "Required";
-          }
+
           return errors;
         }}
       >
