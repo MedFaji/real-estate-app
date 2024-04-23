@@ -55,7 +55,7 @@ const Header = () => {
           </Link>
         </ul>
       </div>
-      <div className="flex gap-4 items-center justify-center">
+      <div className="flex gap-4 items-center ml-6">
         <Link href={"/add-new-listing"} className="hidden md:block">
           <Button>
             <PlusIcon className="h-4 w-4 mr-2" /> Post Your Ad
@@ -93,7 +93,7 @@ const Header = () => {
           </DropdownMenu>
         ) : (
           <Link href={"/sign-in"}>
-            <Button variant="outline">Sign In</Button>
+            <Button variant="outline ">Sign In</Button>
           </Link>
         )}
       </div>
