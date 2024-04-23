@@ -43,7 +43,7 @@ const FileUpload = ({ setImages, listingImages }) => {
               drop
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              SVG, PNG, JPG or GIF (MAX. 800x400px)
+              PNG, JPG or JPEG (MAX. 3000x3000px)
             </p>
           </div>
           <input

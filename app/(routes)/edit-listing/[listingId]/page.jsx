@@ -114,7 +114,7 @@ const EditListing = () => {
     }
     if (data) {
       toast.success("Listing Updated Successfully and Published");
-      uploadImages();
+      await uploadImages();
       setLoading(false);
     }
   };
