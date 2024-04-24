@@ -53,7 +53,7 @@ const Listing = ({
         {listing.length > 0
           ? listing.map((item, index) => (
               <Link href={`/view-listing/${item.id}`} key={index}>
-                <div className="p-3 hover:border hover:border-primary rounded-md h-50 flex flex-col justify-between">
+                <div className="p-3 hover:border hover:border-primary rounded-md h-50 flex flex-col justify-between md:h-[320px]">
                   <Image
                     src={
                       item.listingImages[0]
