@@ -3,7 +3,8 @@ import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import MarkerItem from "./MarkerItem";
 
 const containerStyle = {
-  width: "100%",
+  width: "90%",
+  maxWidth: "90%",
   height: "80vh",
   borderRadius: "20px",
 };
@@ -48,7 +49,6 @@ const GoogleMapSection = ({ coordinates, listing }) => {
       {listing.map((item, index) => (
         <MarkerItem key={index} item={item} />
       ))}
-      <></>
     </GoogleMap>
   );
 };

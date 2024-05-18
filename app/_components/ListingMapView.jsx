@@ -90,7 +90,7 @@ const ListingMapView = ({ type }) => {
           setCoordinates={setCoordinates}
         />
       </div>
-      <div className="md:fixed md:right-10 md:w-[320px] lg:w-[450px] xl:w-[700px] sm:max-h-fit">
+      <div className="md:fixed md:right-10 md:w-[320px] lg:w-[450px] xl:w-[670px] sm:max-h-fit">
         <GoogleMapSection coordinates={coordinates} listing={listing} />
       </div>
     </div>
